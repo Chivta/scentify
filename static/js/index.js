@@ -25,7 +25,7 @@ function handleFormSubmit(){
                     <div class="scentImage">  
                         <img src="${element.image}">
                     </div>
-                    <small>${element.title}</small>
+                    <small>${element.note}</small>
                     <div class="remove">
                         <img src="static/svg/x-mark.svg" class="xmark" alt="Remove">
                     </div>
