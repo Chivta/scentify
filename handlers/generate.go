@@ -6,11 +6,11 @@ import (
 	"log"
 	"net/http"
 	"scentify/managers"
-	"strings"
 )
 
 type GenerateHandler struct {
-	Generator *managers.NoteGenerator
+	Generator *managers.ScentGenerator
+	ImageSearcher *managers.ImageSearcher
 }
 
 func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -32,20 +32,30 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	description := string(bodyByte[:128])
 	log.Println(description)
 
-	notes, err := h.Generator.Generate(description)
-	if err != nil{
+	notes, err := h.Generator.GenerateNotes(description)
+	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	notesSlice := strings.Split(notes, ",")
+	log.Println(notes)
 
-	content := make([]map[string]string, len(notesSlice))
+	notesWithImages, err := h.ImageSearcher.GetQueryImageLinks(notes)
+	if err!=nil{
+		log.Println(err)
+		return
+	}
 
-	for i,note := range notesSlice {
+	content := make([]map[string]string, len(notes))
+
+	for i, noteImage := range notesWithImages {
+		if noteImage.Link == ""{
+			noteImage.Link="static/images/no_image.jpg"
+		}
+
 		content[i] = map[string]string{
-			"image" : "static/images/salt_vinegar.png",
-			"note" : note,
+			"image": noteImage.Link,
+			"note":  noteImage.Query,
 		}
 	}
 

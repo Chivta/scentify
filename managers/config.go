@@ -8,6 +8,7 @@ import (
 type Config struct {
 	OpenAiAPIKey	string `json:"openai_api_key"`
 	PropmtId		string `json:"prompt_id"`
+	SerpApiKey		string `json:"serp_api_key"`
 }
 
 func GetConfig() (*Config, error){

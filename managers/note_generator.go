@@ -4,88 +4,117 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"io"
-	"log"
-	"net/http/httputil"
+	"net/http"
+	_ "net/http/httputil"
+	"strings"
 )
 
-type NoteGenerator struct {
-	cfg *Config 
+type ScentGenerator struct {
+	cfg *Config
 }
 
-func GetNoteGenerator(cfg *Config) (*NoteGenerator){
-	return &NoteGenerator{cfg: cfg}
+func GetScentGenerator(cfg *Config) *ScentGenerator {
+	return &ScentGenerator{cfg: cfg}
 }
-
 
 type APIResponse struct {
-    Output []struct {
+	Output []struct {
+		Type    string `json:"type"`
 		Content []struct {
-			Text string		`json:"text"`
-		} 				`json:"content"`
-	} 				`json:"output"`
+			Type string `json:"type"`
+			Text string `json:"text"`
+		} `json:"content"`
+	} `json:"output"`
 }
 
-func (ngen *NoteGenerator) Generate(description string) (string, error){
-	payload := map[string]interface{}{
+func (sgen *ScentGenerator) fetchAPIResponse(description string) ([]byte, error) {
+	payload := map[string]any{
 		"model": "gpt-5-nano",
 		"reasoning": map[string]string{
 			"effort": "low",
 		},
 		"prompt": map[string]string{
-			"id": ngen.cfg.PropmtId,
+			"id": sgen.cfg.PropmtId,
 		},
 		"input": description,
 	}
 
 	jsonData, err := json.Marshal(payload)
-	if err!=nil{
-		return "",err
+	if err != nil {
+		return nil, err
 	}
 
 	req, err := http.NewRequest("POST", "https://api.openai.com/v1/responses", bytes.NewBuffer(jsonData))
-    if err != nil {
-        return "", nil
-    }
-	req.Header.Set("Content-Type","application/json")
-	req.Header.Set("Authorization","Bearer " + ngen.cfg.OpenAiAPIKey)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+sgen.cfg.OpenAiAPIKey)
 
-	dump, err := httputil.DumpRequest(req, true) // 'true' includes body
-    if err != nil {
-        return "",err
-    }
+	// dump, err := httputil.DumpRequest(req, true) // 'true' includes body
+	// if err != nil {
+	//     return "",err
+	// }
 
-	log.Println(string(dump))
-
+	// log.Println(string(dump))
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-
 	body, err := io.ReadAll(resp.Body)
-	if err!=nil{
-		return "",err
+	if err != nil {
+		return nil, err
 	}
-	
-	log.Println(string(body))
 
 	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("bad response")
+		// log.Println(string(body))
+		return nil, fmt.Errorf("bad response")
 	}
 
+	return body, nil
+}
+
+func (sgen *ScentGenerator) getApiResponse(description string) (APIResponse, error) {
 	var response APIResponse
 
-	err = json.Unmarshal(body,&response)
-	if err != nil{
-		return "", err
+	body, err := sgen.fetchAPIResponse(description)
+	if err != nil {
+		return response, err
 	}
-	log.Println(response)
 
-	return response.Output[1].Content[0].Text,nil
-}	
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
+func (sgen *ScentGenerator) GenerateNotes(description string) ([]string, error) {
+	response, err := sgen.getApiResponse(description)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var scents string
+
+	for _, output := range response.Output {
+		if output.Type == "message" {
+			for _, content := range output.Content {
+				if content.Type == "output_text" {
+					scents = content.Text
+				}
+			}
+		}
+
+	}
+
+	return strings.Split(scents, ","), nil
+}
