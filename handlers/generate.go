@@ -29,7 +29,7 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	description := string(bodyByte[:128])
+	description := string(bodyByte[:256])
 	log.Println(description)
 
 	notes, err := h.Generator.GenerateNotes(description)
