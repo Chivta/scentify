@@ -4,6 +4,14 @@ document.addEventListener("DOMContentLoaded", function() {
         event.preventDefault();
         handleFormSubmit();
     });
+    const noteAmountSlider = document.getElementById("note-amount-slider")
+    noteAmountSlider.addEventListener("input", updateSliderText);
+
+    const darkModeSwitcher = document.getElementById("dark-mode-switcher")
+    darkModeSwitcher.addEventListener("click", () => {
+        const body = document.body;
+        body.classList.toggle("dark-mode-body");
+        })
 });
 
 
@@ -33,4 +41,10 @@ function handleFormSubmit(){
             )
         });
     })
+}
+
+function updateSliderText(){
+    let sliderText = document.getElementById("selected-note-amount")
+    const slider= document.getElementById("note-amount-slider")
+    sliderText.textContent=slider.value
 }

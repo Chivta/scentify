@@ -3,23 +3,81 @@ body{
     font-family: Helvetica Neue, Helvetica, Roboto, Arial, sans-serif;
     font-weight: 400;
     line-height: 1.5;
+
+    background-color: white;
+    color: black
+}
+.dark-mode-body{
+    background-color: rgb(39, 39, 39);
+    color: white;
+}
+.dark-mode-body #settings {
+    background-color: #4d4d4d;
+    color: #eee;
+    border: 1px solid hsla(0, 0%, 91%, 0.25);
+
+}
+
+.dark-mode-body #generator {
+        border: 1px solid hsla(0, 0%, 91%, 0.25);
 }
 
 
-#content {
+
+#dark-mode-switcher{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+#generator-content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items:flex-start;
+    gap: 10%;
+}
+
+#generator {
     display: flex;
     flex-direction: column;
     background-color: #cef8cf;
     text-align: center;
-
     border: 1px solid hsla(0, 0%, 4%, .25);
     border-radius: .2em;
-    margin: 0 0 1rem;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    margin-left: 30%;
-    margin-right: 30%;
-    position: relative;
+    padding: 1% 0;
+}
+#settings {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+
+    background-color: #eeeeee;
+    color:#0a0a0a;
+    border: 1px solid hsla(0, 0%, 4%, .25);
+    border-radius: .2em;
+    padding: 0 3% 3% 3%;
+    gap: 10px;
+}
+
+.settings-row{
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+    gap: 20px;
+}
+
+.settings-row small {
+    width: 2ch;
+}
+
+#note-amount-selector{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
 }
 
 .cards {
