@@ -6,12 +6,19 @@ import (
 	"log"
 	"net/http"
 	"scentify/managers"
+	"slices"
 )
 
 type GenerateHandler struct {
 	Generator *managers.ScentGenerator
 	ImageSearcher *managers.ImageSearcher
 }
+
+type Request struct{
+	Description string 	`json:"desc"`
+	Language string		`json:"lang"`
+	NoteAmount int		`json:"amnt"`
+} 
 
 func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -29,10 +36,25 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	description := string(bodyByte[:256])
-	log.Println(description)
+	var request Request
+	err = json.Unmarshal(bodyByte, &request)
+	if err != nil {
+		log.Println("Error unmarshalling:",err)
+		log.Println(string(bodyByte))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	notes, err := h.Generator.GenerateNotes(description)
+	if !requestValid(request){
+		log.Println("Invalid request:",request)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	log.Println(request)
+
+
+	notes, err := h.Generator.GenerateNotes(request.Description,request.Language,request.NoteAmount)
 	if err != nil {
 		log.Println(err)
 		return
@@ -67,4 +89,25 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(contentJson)
+}
+
+var (
+	allowedLanguages = []string{"en","ua"}
+	maxNodeAmount = 10
+	descriptionLimit = 256
+)
+
+func requestValid(request Request) bool {
+	if len(request.Description)>descriptionLimit{
+		request.Description = request.Description[:descriptionLimit]
+	}
+
+	if !slices.Contains(allowedLanguages, request.Language){
+		return false
+	}
+	if request.NoteAmount > maxNodeAmount{
+		return false
+	}
+
+	return true
 }

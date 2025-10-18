@@ -4,10 +4,10 @@ document.addEventListener("DOMContentLoaded", function() {
         event.preventDefault();
         handleFormSubmit();
     });
-    const noteAmountSlider = document.getElementById("note-amount-slider")
+    const noteAmountSlider = document.getElementById("note-amount-slider");
     noteAmountSlider.addEventListener("input", updateSliderText);
 
-    const darkModeSwitcher = document.getElementById("dark-mode-switcher")
+    const darkModeSwitcher = document.getElementById("dark-mode-switcher");
     darkModeSwitcher.addEventListener("click", () => {
         const body = document.body;
         body.classList.toggle("dark-mode-body");
@@ -16,12 +16,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 function handleFormSubmit(){
-    const value = document.getElementById("request").value;
-    
+    const description = document.getElementById("request").value;
+    const lang = document.getElementById("language-selector").value;
+    const noteAmount = parseInt(document.getElementById("note-amount-slider").value);
+
+    const body = {
+        desc: description,
+        lang: lang,
+        amnt: noteAmount,
+    }
+
     fetch("/generate",{
         method: "POST",
-        headers: { "Content-Type": "text" },
-        body: value
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
     })
     .then(response => response.json())
     .then(data => {
@@ -44,7 +52,7 @@ function handleFormSubmit(){
 }
 
 function updateSliderText(){
-    let sliderText = document.getElementById("selected-note-amount")
-    const slider= document.getElementById("note-amount-slider")
-    sliderText.textContent=slider.value
+    let sliderText = document.getElementById("selected-note-amount");
+    const slider= document.getElementById("note-amount-slider");
+    sliderText.textContent=slider.value;
 }
