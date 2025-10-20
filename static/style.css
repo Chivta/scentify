@@ -3,9 +3,8 @@ body{
     font-family: Helvetica Neue, Helvetica, Roboto, Arial, sans-serif;
     font-weight: 400;
     line-height: 1.5;
-
     background-color: white;
-    color: black
+    color: black;
 }
 .dark-mode-body{
     background-color: rgb(39, 39, 39);
@@ -15,27 +14,23 @@ body{
     background-color: #4d4d4d;
     color: #eee;
     border: 1px solid hsla(0, 0%, 91%, 0.25);
-
 }
-
 .dark-mode-body #generator {
     border: 1px solid hsla(0, 0%, 91%, 0.25);
 }
-
 #dark-mode-switcher{
     position: absolute;
     top: 5px;
     right: 5px;
 }
-
 #generator-content {
     position: relative;
     display: flex;
+    flex-direction: row;
     justify-content: center;
-    align-items:flex-start;
+    align-items: flex-start;
     gap: 10%;
 }
-
 #generator {
     display: flex;
     flex-direction: column;
@@ -45,20 +40,21 @@ body{
     border: 1px solid hsla(0, 0%, 4%, .25);
     border-radius: .2em;
     padding: 1% 0;
+    margin-left: 10%;
+    width: 35%;
 }
 #settings {
     display: flex;
     flex-direction: column;
     text-align: left;
-
     background-color: #eeeeee;
-    color:#0a0a0a;
+    color: #0a0a0a;
     border: 1px solid hsla(0, 0%, 4%, .25);
     border-radius: .2em;
     padding: 0 3% 3% 3%;
     gap: 10px;
+    margin-right: 10%;
 }
-
 .settings-row{
     text-align: left;
     display: flex;
@@ -67,84 +63,68 @@ body{
     align-content: center;
     gap: 20px;
 }
-
 .settings-row small {
     width: 2ch;
 }
-
 .slider{
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 5px;
 }
-
 .cards {
     padding: 16px;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     justify-content: center;
     align-items: flex-start;
 }
-
 .card {
-    width: 20%;
     box-sizing: border-box;
-    flex: 0 0 20%;
-    min-width: 0;
-    max-width: 18%;
+    flex: 0 0 9%;
+    min-width: 80px;
+    max-width: 9%;
     margin: 3px;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 0 4px;
     border: 1px solid white;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    aspect-ratio: 1 / 1.3;
     overflow: visible;
 }
-
-
-.card img {
-    width: 100%;
+.scentImage{
+    display: flex;
+    justify-content: center;
+    padding: 0 4px;
+}
+.scentImage img {
+    width: 70%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
     display: block;
-    
 }
-
 .card small {
     word-break: keep-all;
     overflow-wrap: normal;
     overflow: visible;
-    text-align: center; 
+    text-align: center;
     align-self: center;
 }
-
 .remove {
     display: flex;
     align-items: flex-start;
     justify-content: flex-end;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding: 4px 0;
 }
-
 .xmark {
-    width: 16px !important;
-    height: 16px !important;
+    width: 16px;
+    height: 16px;
     display: block;
     object-fit: contain;
     margin: 0;
     padding: 0;
 }
-
-.scentImage {
-    padding-left: 4px;
-    padding-right: 4px;
-}
-
-
 .input {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -166,7 +146,6 @@ body{
     transition: box-shadow .5s,border-color .25s ease-in-out;
     width: 100%;
 }
-
 #generateForm{
     display: flex;
     flex-direction: row;
@@ -175,7 +154,6 @@ body{
     padding-right: 5%;
     gap: 3%;
 }
-
 #generateForm input[type="submit"] {
     height: 2.4375rem;
     font-size: 1rem;
@@ -190,7 +168,23 @@ body{
     transition: box-shadow .5s, border-color .25s ease-in-out;
     cursor: pointer;
 }
-
 #generateForm .input {
-    margin: 0; 
+    margin: 0;
+}
+
+#loader {
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid #3498db;
+    width: 6%;
+    aspect-ratio: 1/1;
+    animation: spin 2s linear infinite;
+    position: relative;
+    margin-left: 47%;
+    margin-right: 47%;
+    margin-top: 8%;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

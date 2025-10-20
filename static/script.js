@@ -36,12 +36,15 @@ function sliderTextUpdater(sliderId, textId) {
 function handleFormSubmit(){
     let submitButton = document.getElementById("submit-button");
     if (submitButton.disabled) return;
-
+    const description = document.getElementById("request").value;
+    if (description == "") return
     submitButton.disabled = true;
     const prevText = submitButton.value;
     submitButton.value = "Generating...";
 
-    const description = document.getElementById("request").value;
+    let loader = document.getElementById("loader");
+    loader.hidden = false;
+
     const noteAmount = parseInt(document.getElementById("note-amount-slider").value);
     const silliness = parseInt(document.getElementById("silliness-level-slider").value);
     const generateImages = document.getElementById("generate-images-checkbox").checked;
@@ -82,6 +85,7 @@ function handleFormSubmit(){
     .finally(() => {
         submitButton.disabled = false;
         submitButton.value = prevText;
+        loader.hidden = true;
     });
 }
 
