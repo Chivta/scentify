@@ -9,6 +9,17 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("silliness-level-slider")
     .addEventListener("input", sliderTextUpdater("silliness-level-slider","selected-silliness-level"));
 
+    let colorPicker = document.getElementById("generator-color-picker");
+    colorPicker.addEventListener("input",()=>{
+        document.getElementById("generator").style.backgroundColor=colorPicker.value;
+    });
+
+    document.getElementById("color-reset-button")
+    .addEventListener("click",()=>{
+        colorPicker.value="#cef8cf";
+        document.getElementById("generator").style.backgroundColor="#cef8cf";
+    });
+
     document.getElementById("dark-mode-switcher")
     .addEventListener("click", () => {
         const body = document.body;
@@ -21,7 +32,6 @@ function sliderTextUpdater(sliderId, textId) {
     document.getElementById(textId).textContent =
     document.getElementById(sliderId).value;
 }
-
 
 function handleFormSubmit(){
     let submitButton = document.getElementById("submit-button");

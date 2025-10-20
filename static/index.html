@@ -30,24 +30,32 @@
             <h4>Settings</h4> 
 
             <div class="settings-row">
-                <label>Amount of notes: </label>
+                <label>Amount of notes:</label>
                 <div id="note-amount-selector" class="slider">
                     <small id="selected-note-amount">5</small>
                     <input type="range" id="note-amount-slider" min="1" max="10" value="5">                    
                 </div>
             </div>
             <div class="settings-row">
-                <label>Silliness level: </label>
+                <label>Silliness level:</label>
                 <div id="silliness-level-selector" class="slider">
-                    <small id="selected-silliness-level">5</small>
-                    <input type="range" id="silliness-level-slider" min="1" max="10" value="5">                    
+                    <small id="selected-silliness-level">3</small>
+                    <input type="range" id="silliness-level-slider" min="1" max="10" value="3">                    
                 </div>
             </div>
 
             <div class="settings-row">
-                <label>Generate images: </label>
+                <label>Generate images:</label>
                 <input id="generate-images-checkbox" type="checkbox">
             </div>
+            <div class="settings-row">
+                <label>Select color for generator:</label>
+                <div class>
+                    <input type="color" id="generator-color-picker">
+                    <button id="color-reset-button">Reset</button>
+                </div>
+            </div>
+
         </div>
     </div>
 </body>

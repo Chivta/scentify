@@ -19,7 +19,7 @@ body{
 }
 
 .dark-mode-body #generator {
-        border: 1px solid hsla(0, 0%, 91%, 0.25);
+    border: 1px solid hsla(0, 0%, 91%, 0.25);
 }
 
 #dark-mode-switcher{
@@ -119,7 +119,7 @@ body{
     overflow-wrap: normal;
     overflow: visible;
     text-align: center; 
-    align-self: center; /* Center the small element itself */
+    align-self: center;
 }
 
 .remove {
