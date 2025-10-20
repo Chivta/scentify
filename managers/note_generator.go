@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	_ "net/http/httputil"
 	"strings"
-	"strconv"
-	"log"
 )
 
 type ScentGenerator struct {
@@ -30,20 +29,17 @@ type APIResponse struct {
 	} `json:"output"`
 }
 
-func (sgen *ScentGenerator) fetchAPIResponse(description, lang string, amount int) ([]byte, error) {
+func (sgen *ScentGenerator) fetchAPIResponse(description string, variables map[string]string) ([]byte, error) {
 	payload := map[string]any{
 		"model": "gpt-5-nano",
 		"reasoning": map[string]string{
 			"effort": "low",
 		},
 		"prompt": map[string]any{
-			"id": sgen.cfg.PropmtId,
-			"variables": map[string]string{
-				"note_amount": strconv.Itoa(amount),
-				"response_lang": lang,
-			},
+			"id":        sgen.cfg.PropmtId,
+			"variables": variables,
 		},
-		
+
 		"input": description,
 	}
 
@@ -80,17 +76,17 @@ func (sgen *ScentGenerator) fetchAPIResponse(description, lang string, amount in
 	}
 
 	if resp.StatusCode != 200 {
-		log.Println(string	(body))
+		log.Println(string(body))
 		return nil, fmt.Errorf("bad response")
 	}
 
 	return body, nil
 }
 
-func (sgen *ScentGenerator) getApiResponse(description, lang string, amount int) (APIResponse, error) {
+func (sgen *ScentGenerator) getApiResponse(description string, variables map[string]string) (APIResponse, error) {
 	var response APIResponse
 
-	body, err := sgen.fetchAPIResponse(description,lang,amount)
+	body, err := sgen.fetchAPIResponse(description, variables)
 	if err != nil {
 		return response, err
 	}
@@ -103,8 +99,18 @@ func (sgen *ScentGenerator) getApiResponse(description, lang string, amount int)
 	return response, nil
 }
 
-func (sgen *ScentGenerator) GenerateNotes(description, lang string, amount int) ([]string, error) {
-	response, err := sgen.getApiResponse(description,lang,amount)
+func (sgen *ScentGenerator) GenerateNotes(description string, variables map[string]any) ([]string, error) {
+	variablesStr := make(map[string]string,len(variables))
+	for k,v := range variables{
+		switch v.(type){
+		case int:
+			variablesStr[k]=fmt.Sprintf("%d",v)
+		case string:
+			variablesStr[k]=fmt.Sprintf("%s",v)
+		}
+	}
+
+	response, err := sgen.getApiResponse(description, variablesStr)
 
 	if err != nil {
 		return nil, err

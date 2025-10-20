@@ -6,19 +6,18 @@ import (
 	"log"
 	"net/http"
 	"scentify/managers"
-	"slices"
 )
 
 type GenerateHandler struct {
-	Generator *managers.ScentGenerator
+	Generator     *managers.ScentGenerator
 	ImageSearcher *managers.ImageSearcher
 }
 
-type Request struct{
-	Description string 	`json:"desc"`
-	Language string		`json:"lang"`
-	NoteAmount int		`json:"amnt"`
-} 
+type Request struct {
+	Description string `json:"description"`
+	NoteAmount  int    `json:"noteAmount"`
+	Silliness   int    `json:"silliness"`
+}
 
 func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -32,29 +31,33 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if len(bodyByte) == 0{
-	// 	return
-	// }
+	if len(bodyByte) == 0 {
+		return
+	}
 
 	var request Request
 	err = json.Unmarshal(bodyByte, &request)
 	if err != nil {
-		log.Println("Error unmarshalling:",err)
+		log.Println("Error unmarshalling:", err)
 		log.Println(string(bodyByte))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if !requestValid(request){
-		log.Println("Invalid request:",request)
+	if !requestValid(request) {
+		log.Println("Invalid request:", request)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	log.Println(request)
 
-
-	notes, err := h.Generator.GenerateNotes(request.Description,request.Language,request.NoteAmount)
+	notes, err := h.Generator.GenerateNotes(request.Description, 
+		map[string]any{
+			"note_amount": request.NoteAmount, 
+			"silliness": request.Silliness,
+		},
+	)
 	if err != nil {
 		log.Println(err)
 		return
@@ -63,7 +66,7 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(notes)
 
 	notesWithImages, err := h.ImageSearcher.GetQueryImageLinks(notes)
-	if err!=nil{
+	if err != nil {
 		log.Println(err)
 		return
 	}
@@ -71,8 +74,8 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	content := make([]map[string]string, len(notes))
 
 	for i, noteImage := range notesWithImages {
-		if noteImage.Link == ""{
-			noteImage.Link="static/images/no_image.jpg"
+		if noteImage.Link == "" {
+			noteImage.Link = "static/images/no_image.jpg"
 		}
 
 		content[i] = map[string]string{
@@ -92,20 +95,23 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 var (
-	allowedLanguages = []string{"en","ua"}
-	maxNodeAmount = 10
-	descriptionLimit = 256
+	minSillinessLevel = 1
+	maxSillinessLevel = 10
+	minNodeAmount     = 1
+	maxNodeAmount     = 10
+	descriptionLimit  = 256
 )
 
 func requestValid(request Request) bool {
-	if len(request.Description)>descriptionLimit{
+	if len(request.Description) > descriptionLimit {
 		request.Description = request.Description[:descriptionLimit]
 	}
 
-	if !slices.Contains(allowedLanguages, request.Language){
+	if request.NoteAmount > maxNodeAmount || request.NoteAmount < minNodeAmount {
 		return false
 	}
-	if request.NoteAmount > maxNodeAmount{
+
+	if request.Silliness > maxSillinessLevel || request.Silliness < minSillinessLevel {
 		return false
 	}
 

@@ -22,8 +22,6 @@ body{
         border: 1px solid hsla(0, 0%, 91%, 0.25);
 }
 
-
-
 #dark-mode-switcher{
     position: absolute;
     top: 5px;
@@ -73,7 +71,7 @@ body{
     width: 2ch;
 }
 
-#note-amount-selector{
+.slider{
     display: flex;
     flex-direction: row;
     align-items: center;

@@ -1,29 +1,37 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("generateForm");
-    form.addEventListener("submit",function(event){
+    document.getElementById("generateForm")
+    .addEventListener("submit",function(event){
         event.preventDefault();
         handleFormSubmit();
     });
-    const noteAmountSlider = document.getElementById("note-amount-slider");
-    noteAmountSlider.addEventListener("input", updateSliderText);
+    document.getElementById("note-amount-slider")
+    .addEventListener("input", sliderTextUpdater("note-amount-slider","selected-note-amount"));
+    document.getElementById("silliness-level-slider")
+    .addEventListener("input", sliderTextUpdater("silliness-level-slider","selected-silliness-level"));
 
-    const darkModeSwitcher = document.getElementById("dark-mode-switcher");
-    darkModeSwitcher.addEventListener("click", () => {
+    document.getElementById("dark-mode-switcher")
+    .addEventListener("click", () => {
         const body = document.body;
         body.classList.toggle("dark-mode-body");
-        })
+    });
 });
+
+function sliderTextUpdater(sliderId, textId) {
+    return () => 
+    document.getElementById(textId).textContent =
+    document.getElementById(sliderId).value;
+}
 
 
 function handleFormSubmit(){
     const description = document.getElementById("request").value;
-    const lang = document.getElementById("language-selector").value;
     const noteAmount = parseInt(document.getElementById("note-amount-slider").value);
+    const silliness = parseInt(document.getElementById("silliness-level-slider").value);
 
     const body = {
-        desc: description,
-        lang: lang,
-        amnt: noteAmount,
+        description: description,
+        silliness: silliness,
+        noteAmount: noteAmount,
     }
 
     fetch("/generate",{
@@ -51,8 +59,3 @@ function handleFormSubmit(){
     })
 }
 
-function updateSliderText(){
-    let sliderText = document.getElementById("selected-note-amount");
-    const slider= document.getElementById("note-amount-slider");
-    sliderText.textContent=slider.value;
-}

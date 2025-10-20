@@ -28,19 +28,19 @@
 
         <div id="settings">
             <h4>Settings</h4> 
-            <div class="settings-row">
-                <label>Result language: </label>
-                <select id="language-selector">
-                    <option value="ua">Українська</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
 
             <div class="settings-row">
                 <label>Amount of notes: </label>
-                <div id="note-amount-selector">
+                <div id="note-amount-selector" class="slider">
                     <small id="selected-note-amount">5</small>
                     <input type="range" id="note-amount-slider" min="1" max="10" value="5">                    
+                </div>
+            </div>
+            <div class="settings-row">
+                <label>Silliness level: </label>
+                <div id="silliness-level-selector" class="slider">
+                    <small id="selected-silliness-level">5</small>
+                    <input type="range" id="silliness-level-slider" min="1" max="10" value="5">                    
                 </div>
             </div>
         </div>
