@@ -19,7 +19,7 @@
         <div id="generator">
             <form id="generateForm">
                 <input class="input" id="request" type="text" placeholder="Enter something">
-                <input type="submit" value="Generate">
+                <input type="submit" value="Generate" id="submit-button">
             </form>
             <div class="cards" id="cards">
             </div>
@@ -42,6 +42,11 @@
                     <small id="selected-silliness-level">5</small>
                     <input type="range" id="silliness-level-slider" min="1" max="10" value="5">                    
                 </div>
+            </div>
+
+            <div class="settings-row">
+                <label>Generate images: </label>
+                <input id="generate-images-checkbox" type="checkbox">
             </div>
         </div>
     </div>

@@ -4,7 +4,7 @@ import (
 	"io"
 	"log"
 	"net/http"
-	_ "net/http/httputil" 
+	_ "net/http/httputil"
 	_ "os"
 	"regexp"
 	"sync"
@@ -18,33 +18,21 @@ func GetImageSearcher(cfg *Config) *ImageSearcher {
 	return &ImageSearcher{cfg: cfg}
 }
 
-type QueryLink struct {
-	Query, Link string
-}
-
-func (imser *ImageSearcher) GetQueryImageLinks(queries []string) ([]QueryLink, error) {
-	resChan := make(chan QueryLink, len(queries))
+func (imser *ImageSearcher) GetQueryImageLinks(queries []string) ([]string, error) {
+	res := make([]string, len(queries))
 
 	var wg sync.WaitGroup
 	wg.Add(len(queries))
-	for _, query := range queries {
-		go func(q string) {
+	for i, q := range queries {
+		i, q := i, q 
+		go func() {
 			defer wg.Done()
-			imser.getImageLink(q, resChan)
-		}(query)
-	}
-	go func() {
-		wg.Wait()
-		close(resChan)
-	}()
-
-	result := make([]QueryLink, 0, len(queries))
-
-	for queryLink := range resChan {
-		result = append(result, queryLink)
+			imser.getImageLink(q, &res[i])
+		}()
 	}
 
-	return result, nil
+	wg.Wait()
+	return res, nil
 }
 
 var (
@@ -52,11 +40,11 @@ var (
 	imageLinkRe = regexp.MustCompile(`(?s){.*"position":\s?1,\n.*"original":\s?"(.*)",\n.*}`)
 )
 
-func (imser *ImageSearcher) getImageLink(query string, res chan QueryLink) {
+func (imser *ImageSearcher) getImageLink(query string, imageLink *string) {
 	req, err := http.NewRequest("GET", "https://serpapi.com/search", nil)
 	if err != nil {
 		log.Println(err)
-		res <- QueryLink{Query: query, Link: ""}
+		*imageLink = ""
 		return
 	}
 
@@ -79,20 +67,20 @@ func (imser *ImageSearcher) getImageLink(query string, res chan QueryLink) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println(err)
-		res <- QueryLink{Query: query, Link: ""}
+		*imageLink = ""
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		res <- QueryLink{Query: query, Link: ""}
+		*imageLink = ""
 		return
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
-		res <- QueryLink{Query: query, Link: ""}
+		*imageLink = ""
 		return
 	}
 
@@ -109,11 +97,11 @@ func (imser *ImageSearcher) getImageLink(query string, res chan QueryLink) {
 		// 	}
 		// 	f.Close()
 		// }
-		res <- QueryLink{Query: query, Link: ""}
+		*imageLink = ""
 		return
 	}
 
 	link := string(match[1])
 
-	res <- QueryLink{Query: query, Link: link}
+	*imageLink = link
 }

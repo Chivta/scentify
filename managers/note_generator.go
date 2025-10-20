@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/httputil"
+	"strconv"
 	"strings"
 )
 
@@ -99,18 +100,53 @@ func (sgen *ScentGenerator) getApiResponse(description string, variables map[str
 	return response, nil
 }
 
-func (sgen *ScentGenerator) GenerateNotes(description string, variables map[string]any) ([]string, error) {
-	variablesStr := make(map[string]string,len(variables))
+var (
+	sillinessLevels = map[int]string{
+		1:"All notes must be real perfume ingredients (e.g., jasmine, amber, cedarwood).",
+		2:"Notes should be mostly real (75% real, 25% invented scents).",
+		3:"Notes should be half real, half invented (50/50 mix).",
+		4:"Notes should be mostly imaginary scents (25% real, 75% invented).",
+		5:"All notes must be invented scents (e.g., “midnight rain,” “old library”).",
+		6:"Notes should be mostly invented scents (75% invented, 25% abstract vibes).",
+		7:"Notes should be half invented, half vibe-like concepts (50/50).",
+		8:"Notes should mostly be vibes (75% vibes, 25% invented scents)",
+		9:"All notes must be vibes only (e.g. “melancholy,” “sunset regret”).",
+		10:"All notes must be fully symbolic or surreal vibes — pure emotion or concept, not related to scent at all.",
+	}
+)
+
+func formatVariables(variables map[string]any) (map[string]string){
+	variablesFormated := make(map[string]string,len(variables))
+
+	if sillines,ok := variables["silliness"]; ok {
+		sillinesInt, ok := sillines.(int)
+		if !ok {
+			log.Println("Sillines is not an int. silliness:",sillines)
+		}else{
+			variables["silliness"] = sillinessLevels[sillinesInt]
+		}
+	}else{
+		log.Println("Did not found silliness")
+	}
+
 	for k,v := range variables{
-		switch v.(type){
+		switch vConv:=v.(type){
 		case int:
-			variablesStr[k]=fmt.Sprintf("%d",v)
+			variablesFormated[k]=strconv.Itoa(vConv)
 		case string:
-			variablesStr[k]=fmt.Sprintf("%s",v)
+			variablesFormated[k]=vConv
 		}
 	}
 
-	response, err := sgen.getApiResponse(description, variablesStr)
+	return variablesFormated
+}
+
+func (sgen *ScentGenerator) GenerateNotes(description string, variables map[string]any) ([]string, error) {
+	variablesFormated := formatVariables(variables)
+
+	log.Println("Variables formated:",variablesFormated)
+
+	response, err := sgen.getApiResponse(description, variablesFormated)
 
 	if err != nil {
 		return nil, err

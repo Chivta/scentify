@@ -24,14 +24,26 @@ function sliderTextUpdater(sliderId, textId) {
 
 
 function handleFormSubmit(){
+    let submitButton = document.getElementById("submit-button");
+    if (submitButton.disabled) return;
+
+    submitButton.disabled = true;
+    const prevText = submitButton.value;
+    submitButton.value = "Generating...";
+
     const description = document.getElementById("request").value;
     const noteAmount = parseInt(document.getElementById("note-amount-slider").value);
     const silliness = parseInt(document.getElementById("silliness-level-slider").value);
+    const generateImages = document.getElementById("generate-images-checkbox").checked;
+
+    let cards = document.getElementById("cards");
+    cards.innerHTML="";
 
     const body = {
         description: description,
         silliness: silliness,
         noteAmount: noteAmount,
+        generateImages: generateImages
     }
 
     fetch("/generate",{
@@ -41,8 +53,6 @@ function handleFormSubmit(){
     })
     .then(response => response.json())
     .then(data => {
-        let cards = document.getElementById("cards");
-        cards.innerHTML="";
         data.forEach(element => {
             cards.insertAdjacentHTML("beforeend",`
                 <div class="card">
@@ -51,11 +61,17 @@ function handleFormSubmit(){
                     </div>
                     <small>${element.note}</small>
                     <div class="remove">
-                        <img src="static/svg/x-mark.svg" class="xmark" alt="Remove">
+                        <img src="static/x-mark.svg" class="xmark">
                     </div>
                 </div>`
             )
         });
+    }).catch(err => {
+        console.error(err);
     })
+    .finally(() => {
+        submitButton.disabled = false;
+        submitButton.value = prevText;
+    });
 }
 

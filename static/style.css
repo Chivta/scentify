@@ -40,6 +40,7 @@ body{
     display: flex;
     flex-direction: column;
     background-color: #cef8cf;
+    color: black;
     text-align: center;
     border: 1px solid hsla(0, 0%, 4%, .25);
     border-radius: .2em;

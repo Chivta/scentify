@@ -14,9 +14,10 @@ type GenerateHandler struct {
 }
 
 type Request struct {
-	Description string `json:"description"`
-	NoteAmount  int    `json:"noteAmount"`
-	Silliness   int    `json:"silliness"`
+	Description 	string	`json:"description"`
+	NoteAmount  	int		`json:"noteAmount"`
+	Silliness   	int		`json:"silliness"`
+	GenerateImages 	bool	`json:"generateImages"`
 }
 
 func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -28,10 +29,6 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	bodyByte, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
-		return
-	}
-
-	if len(bodyByte) == 0 {
 		return
 	}
 
@@ -65,26 +62,32 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(notes)
 
-	notesWithImages, err := h.ImageSearcher.GetQueryImageLinks(notes)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	imageLinks := make([]string,len(notes))
 
-	content := make([]map[string]string, len(notes))
-
-	for i, noteImage := range notesWithImages {
-		if noteImage.Link == "" {
-			noteImage.Link = "static/images/no_image.jpg"
-		}
-
-		content[i] = map[string]string{
-			"image": noteImage.Link,
-			"note":  noteImage.Query,
+	if request.GenerateImages{
+		imageLinks, err = h.ImageSearcher.GetQueryImageLinks(notes)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}
 
-	contentJson, err := json.Marshal(content)
+
+	response := make([]map[string]string, len(notes))
+
+	for i := range imageLinks {
+		if imageLinks[i] == "" {
+			imageLinks[i] = "static/images/no_image.png"
+		}
+
+		response[i] = map[string]string{
+			"image": imageLinks[i],
+			"note":  notes[i],
+		}
+	}
+
+	contentJson, err := json.Marshal(response)
 
 	if err != nil {
 		log.Println(err)
@@ -105,6 +108,8 @@ var (
 func requestValid(request Request) bool {
 	if len(request.Description) > descriptionLimit {
 		request.Description = request.Description[:descriptionLimit]
+	}else if len(request.Description) == 0 {
+		return false
 	}
 
 	if request.NoteAmount > maxNodeAmount || request.NoteAmount < minNodeAmount {
