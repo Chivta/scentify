@@ -1,4 +1,4 @@
-package managers
+package services
 
 import (
 	"bytes"
@@ -10,6 +10,8 @@ import (
 	_ "net/http/httputil"
 	"strconv"
 	"strings"
+	. "scentify/models"
+	. "scentify/config"
 )
 
 type ScentGenerator struct {
@@ -20,15 +22,6 @@ func GetScentGenerator(cfg *Config) *ScentGenerator {
 	return &ScentGenerator{cfg: cfg}
 }
 
-type APIResponse struct {
-	Output []struct {
-		Type    string `json:"type"`
-		Content []struct {
-			Type string `json:"type"`
-			Text string `json:"text"`
-		} `json:"content"`
-	} `json:"output"`
-}
 
 func (sgen *ScentGenerator) fetchAPIResponse(description string, variables map[string]string) ([]byte, error) {
 	payload := map[string]any{

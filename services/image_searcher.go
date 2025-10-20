@@ -1,6 +1,7 @@
-package managers
+package services
 
 import (
+	. "scentify/config"
 	"io"
 	"log"
 	"net/http"

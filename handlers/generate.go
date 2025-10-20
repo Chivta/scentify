@@ -5,20 +5,15 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"scentify/managers"
+	"scentify/services"
+	. "scentify/models"
 )
 
 type GenerateHandler struct {
-	Generator     *managers.ScentGenerator
-	ImageSearcher *managers.ImageSearcher
+	Generator     *services.ScentGenerator
+	ImageSearcher *services.ImageSearcher
 }
 
-type Request struct {
-	Description 	string	`json:"description"`
-	NoteAmount  	int		`json:"noteAmount"`
-	Silliness   	int		`json:"silliness"`
-	GenerateImages 	bool	`json:"generateImages"`
-}
 
 func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -32,7 +27,7 @@ func (h *GenerateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request Request
+	var request GenerateRequest
 	err = json.Unmarshal(bodyByte, &request)
 	if err != nil {
 		log.Println("Error unmarshalling:", err)
@@ -105,7 +100,7 @@ var (
 	descriptionLimit  = 256
 )
 
-func requestValid(request Request) bool {
+func requestValid(request GenerateRequest) bool {
 	if len(request.Description) > descriptionLimit {
 		request.Description = request.Description[:descriptionLimit]
 	}else if len(request.Description) == 0 {

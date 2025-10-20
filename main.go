@@ -5,17 +5,18 @@ import (
 	"net/http"
 	"os"
 	"scentify/handlers"
-	"scentify/managers"
+	"scentify/services"
+	"scentify/config"
 )
 
 func main() {
-	cfg, err := managers.GetConfig()
+	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	generator := managers.GetScentGenerator(cfg)
-	imageSearcher := managers.GetImageSearcher(cfg)
+	generator := services.GetScentGenerator(cfg)
+	imageSearcher := services.GetImageSearcher(cfg)
 
 	http.Handle("/generate", &handlers.GenerateHandler{
 		Generator: generator,
